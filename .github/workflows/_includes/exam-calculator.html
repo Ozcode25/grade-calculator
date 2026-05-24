@@ -1,0 +1,151 @@
+<!-- _includes/exam-calculator.html -->
+<div class="exam-calculator" aria-live="polite">
+  <h2>📊 Calculadora de Puntos del Examen</h2>
+  
+  <div class="input-group">
+    <input type="number" id="scoreInput" placeholder="Ej: 8.5, 10, 15.25" step="0.01" min="0" aria-label="Puntos a agregar">
+    <button id="addBtn" type="button">➕ Agregar</button>
+  </div>
+
+  <ul id="scoreList" class="score-list"></ul>
+
+  <div class="total-section">
+    <span>Total acumulado:</span>
+    <strong id="totalScore">0.00</strong>
+  </div>
+
+  <button id="resetBtn" type="button" class="reset-btn">🔄 Reiniciar</button>
+</div>
+
+<style>
+.exam-calculator {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 520px;
+  margin: 24px auto;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  color: #212529;
+}
+.exam-calculator h2 {
+  margin: 0 0 16px;
+  font-size: 1.4rem;
+  text-align: center;
+  color: #0d6efd;
+}
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+#scoreInput {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #ced4da;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+#scoreInput:focus { outline: none; border-color: #0d6efd; }
+#addBtn {
+  padding: 12px 18px;
+  background: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#addBtn:hover, #addBtn:focus { background: #0b5ed7; outline: none; }
+.score-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  max-height: 160px;
+  overflow-y: auto;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+.score-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f3f5;
+  font-size: 15px;
+}
+.score-list li:last-child { border-bottom: none; }
+.total-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  background: #e7f1ff;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 1.1rem;
+}
+.reset-btn {
+  width: 100%;
+  padding: 12px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.reset-btn:hover, .reset-btn:focus { background: #5c636a; outline: none; }
+
+/* 📱 Responsive para móvil */
+@media (max-width: 600px) {
+  .exam-calculator { margin: 16px 12px; padding: 16px; }
+  .input-group { flex-direction: column; }
+  #addBtn { width: 100%; }
+  .exam-calculator h2 { font-size: 1.25rem; }
+}
+</style>
+
+<script>
+(function() {
+  const scoreInput = document.getElementById('scoreInput');
+  const addBtn = document.getElementById('addBtn');
+  const scoreList = document.getElementById('scoreList');
+  const totalScore = document.getElementById('totalScore');
+  const resetBtn = document.getElementById('resetBtn');
+  let scores = [];
+
+  function render() {
+    scoreList.innerHTML = '';
+    scores.forEach((val, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span>Pregunta/Sección ${i + 1}</span><strong>${val}</strong>`;
+      scoreList.appendChild(li);
+    });
+    const total = scores.reduce((sum, v) => sum + v, 0);
+    totalScore.textContent = parseFloat(total.toFixed(2)).toLocaleString('es-ES', {minimumFractionDigits: 2});
+  }
+
+  function addScore() {
+    const raw = scoreInput.value.replace(',', '.');
+    const val = parseFloat(raw);
+    if (isNaN(val) || val < 0) {
+      alert('Ingresa un número válido mayor o igual a 0.');
+      return;
+    }
+    scores.push(val);
+    render();
+    scoreInput.value = '';
+    scoreInput.focus();
+  }
+
+  addBtn.addEventListener('click', addScore);
+  scoreInput.addEventListener('keypress', e => { if (e.key === 'Enter') addScore(); });
+  resetBtn.addEventListener('click', () => { scores = []; render(); scoreInput.value = ''; });
+})();
+</script>
